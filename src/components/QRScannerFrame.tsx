@@ -16,19 +16,40 @@ export const QRScannerFrame: React.FC<QRScannerFrameProps> = ({
   className = '',
 }) => {
   const scannerRef = useRef<Html5Qrcode | null>(null);
+  const startedRef = useRef(false);
+  const cancelledRef = useRef(false);
+  const decodedRef = useRef(false);
+  const onDecodedRef = useRef(onDecoded);
+  const onErrorRef = useRef(onError);
   const [hasError, setHasError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [torchOn, setTorchOn] = useState(false);
   const [facingMode, setFacingMode] = useState<'environment' | 'user'>('environment');
   const [attempt, setAttempt] = useState(0);
-  const decodedRef = useRef(false);
   const scannerId = useId();
+
+  useEffect(() => {
+    onDecodedRef.current = onDecoded;
+    onErrorRef.current = onError;
+  }, [onDecoded, onError]);
 
   useEffect(() => {
     if (!isActive) return;
 
-    let mounted = true;
+    let scannerStoppedSilently = false;
+    cancelledRef.current = false;
     decodedRef.current = false;
+
+    const safelyStop = (scanner: Html5Qrcode | null) => {
+      if (!scanner || !startedRef.current) return;
+      try {
+        scanner.stop().catch(() => {});
+      } catch {
+        // html5-qrcode stop() throws synchronously when the scanner is not
+        // running or paused. Silently ignore so the error never reaches React.
+      }
+      startedRef.current = false;
+    };
 
     const initScanner = async () => {
       try {
@@ -45,32 +66,47 @@ export const QRScannerFrame: React.FC<QRScannerFrameProps> = ({
             qrbox: { width: 240, height: 240 },
           },
           (decodedText: string) => {
-            if (!decodedRef.current && mounted) {
+            if (cancelledRef.current) return;
+            if (!decodedRef.current) {
               decodedRef.current = true;
-              scanner.stop().catch(() => {});
-              onDecoded(decodedText);
+              onDecodedRef.current(decodedText);
             }
           },
           () => {}
         );
+
+        if (cancelledRef.current) {
+          safelyStop(scanner);
+          return;
+        }
+
+        startedRef.current = true;
+        scannerStoppedSilently = false;
       } catch (err) {
-        if (!mounted) return;
+        if (cancelledRef.current) return;
         const msg = err instanceof Error ? err.message : 'Unknown camera error';
         setHasError(msg);
-        onError?.(msg);
+        onErrorRef.current?.(msg);
       } finally {
-        if (mounted) setIsLoading(false);
+        if (!cancelledRef.current) setIsLoading(false);
       }
     };
 
     initScanner();
 
     return () => {
-      mounted = false;
-      scannerRef.current?.stop().catch(() => {});
+      cancelledRef.current = true;
+      const scanner = scannerRef.current;
       scannerRef.current = null;
+      if (scanner && scanner !== null) {
+        if (!scannerStoppedSilently) {
+          safelyStop(scanner);
+        }
+      }
+      startedRef.current = false;
+      setTorchOn(false);
     };
-  }, [isActive, facingMode, attempt, onDecoded, onError, scannerId]);
+  }, [isActive, facingMode, attempt, scannerId]);
 
   const handleTorchToggle = async () => {
     try {
