@@ -135,11 +135,17 @@ export const QRScannerFrame: React.FC<QRScannerFrameProps> = ({
 
   return (
     <div
-      id={scannerId}
       className={`relative w-full aspect-square overflow-hidden ${className}`}
       style={{ minHeight: 280 }}
     >
-      <div className="w-full h-full bg-[#050b18] rounded-xl border border-blue-800/50 overflow-hidden" />
+      {/* html5-qrcode attaches its video/canvas/shader nodes into this
+          container. It calls clearElement() (innerHTML = "") on every
+          start(), so this container must stay a DOM leaf with no React
+          children inside it. All UI overlays live as siblings below. */}
+      <div
+        id={scannerId}
+        className="w-full h-full bg-[#050b18] rounded-xl border border-blue-800/50 overflow-hidden"
+      />
 
       {/* Loading overlay */}
       {isLoading && (
