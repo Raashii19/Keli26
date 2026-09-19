@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">KELI26</string>
+    <string name="title_activity_main">KELI26</string>
+    <string name="package_name">com.keli26.festival</string>
+    <string name="custom_url_scheme">com.keli26.festival</string>
+</resources>

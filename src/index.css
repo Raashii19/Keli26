@@ -1,0 +1,145 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    /* Solid Blue Hierarchy - used everywhere EXCEPT scanner area */
+    --blue-950:  #030712;    /* Page background - deepest */
+    --blue-900:  #0a152f;    /* Header, cards, drawer - primary surface */
+    --blue-800:  #111e3d;    /* Elevated surfaces, modals, buttons */
+    --blue-700:  #1e3a5f;    /* Hover states, borders */
+    --blue-600:  #2d4a7c;    /* Active states, focus rings */
+
+    /* Primary Accent - Electric Cyan */
+    --cyan-400:  #22d3ee;    /* Primary buttons, links, scanner frame */
+    --cyan-500:  #06b6d4;    /* Button hover, active */
+    --cyan-600:  #0891b2;    /* Button pressed */
+
+    /* Semantic */
+    --valid-400:   #34d399;  /* Emerald - valid tickets */
+    --invalid-400: #f87171;  /* Rose - invalid tickets */
+    --warning-400: #fbbf24;  /* Amber - duplicate/already used */
+
+    /* Text */
+    --text-primary:   #f1f5f9;  /* Slate-100 */
+    --text-secondary: #94a3b8;  /* Slate-400 */
+    --text-muted:     #64748b;  /* Slate-500 */
+  }
+
+  body {
+    background-color: var(--blue-950);
+    color: var(--text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+}
+
+@layer utilities {
+  .pt-safe {
+    padding-top: max(env(safe-area-inset-top), 10px);
+  }
+  .pb-safe {
+    padding-bottom: max(env(safe-area-inset-bottom), 10px);
+  }
+
+  /* Blue surface utilities */
+  .bg-blue-deep { background-color: var(--blue-950); }
+  .bg-blue-surface { background-color: var(--blue-900); }
+  .bg-blue-elevated { background-color: var(--blue-800); }
+  .bg-blue-hover { background-color: var(--blue-700); }
+  .bg-blue-active { background-color: var(--blue-600); }
+
+  .border-blue-subtle { border-color: var(--blue-700); }
+  .border-blue-medium { border-color: var(--blue-600); }
+
+  .text-cyan-primary { color: var(--cyan-400); }
+  .text-cyan-hover { color: var(--cyan-500); }
+  .bg-cyan-primary { background-color: var(--cyan-400); }
+  .bg-cyan-hover { background-color: var(--cyan-500); }
+  .bg-cyan-active { background-color: var(--cyan-600); }
+
+  .text-valid { color: var(--valid-400); }
+  .bg-valid { background-color: var(--valid-400); }
+  .border-valid { border-color: var(--valid-400); }
+
+  .text-invalid { color: var(--invalid-400); }
+  .bg-invalid { background-color: var(--invalid-400); }
+  .border-invalid { border-color: var(--invalid-400); }
+
+  .text-warning { color: var(--warning-400); }
+  .bg-warning { background-color: var(--warning-400); }
+  .border-warning { border-color: var(--warning-400); }
+}
+
+@keyframes scan-line {
+  0% {
+    top: 5%;
+    opacity: 0.4;
+  }
+  50% {
+    top: 92%;
+    opacity: 1;
+  }
+  100% {
+    top: 5%;
+    opacity: 0.4;
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(6, 182, 212, 0.4), inset 0 0 15px rgba(6, 182, 212, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(6, 182, 212, 0.7), inset 0 0 25px rgba(6, 182, 212, 0.35);
+  }
+}
+
+@keyframes logo-float {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-6px) scale(1.02);
+  }
+}
+
+@keyframes drawer-slide {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes bottom-sheet-slide {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scale-in {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.animate-scan-line { animation: scan-line 2.2s ease-in-out infinite; }
+.animate-pulse-glow { animation: pulse-glow 2.5s ease-in-out infinite; }
+.animate-logo-float { animation: logo-float 3s ease-in-out infinite; }
+.animate-drawer-in { animation: drawer-slide 0.3s ease-out; }
+.animate-sheet-in { animation: bottom-sheet-slide 0.3s ease-out; }
+.animate-fade-in { animation: fade-in 0.2s ease-out; }
+.animate-scale-in { animation: scale-in 0.2s ease-out; }
+
+/* Scrollbar hiding */
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
